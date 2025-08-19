@@ -4,6 +4,17 @@ This directory contains scripts and tools for collecting GitHub issues data from
 
 ## Quick Start
 
+### Basic System Test
+
+Before running the full analysis, you can verify the system with a simple hello world test:
+
+```bash
+cd tools
+python hello_test.py
+```
+
+This will verify that Python and basic dependencies are working correctly.
+
 ### Option 1: Python Script (Recommended)
 
 1. **Setup Environment**:
@@ -233,6 +244,33 @@ After collecting the data:
 2. **Follow Analysis Templates**: Use the frameworks in `../analysis/` directory
 3. **Generate Insights**: Look for patterns in high-engagement issues
 4. **Create Reports**: Use `../reports/` templates for stakeholder communication
+
+## Testing and Validation
+
+### Basic System Tests
+
+The tools directory includes several test utilities:
+
+- **`hello_test.py`**: Basic system verification and hello world test
+- **`test_hello.py`**: Unit tests for the hello world functionality
+- **`test_auth.py`**: GitHub authentication testing
+- **`simple_test.py`**: Simple GitHub API access test
+
+Run tests to verify your setup:
+
+```bash
+# Basic system test
+python hello_test.py
+
+# Run unit tests
+python test_hello.py
+
+# Test GitHub authentication (requires GITHUB_TOKEN)
+python test_auth.py
+
+# Test GitHub API access
+python simple_test.py
+```
 
 ## Advanced Usage
 

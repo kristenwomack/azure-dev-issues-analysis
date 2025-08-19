@@ -186,3 +186,6 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# Test result files
+hello_test_results.json
