@@ -219,6 +219,10 @@ def generate_complete_auth_report(data_files, output_file):
     
     print(f"Total authentication issues found: {len(all_auth_issues)}")
     
+    # Filter to only open issues
+    all_auth_issues = [issue for issue in all_auth_issues if issue.get('state', '') == 'open']
+    print(f"Open authentication issues: {len(all_auth_issues)}")
+    
     # Sort issues by priority score
     all_auth_issues.sort(key=lambda x: -x.get('priority_score', 0))
     
@@ -231,16 +235,15 @@ def generate_complete_auth_report(data_files, output_file):
     # Sort categories by count
     sorted_categories = sorted(category_stats.items(), key=lambda x: -x[1])
     
-    # Split issues by state
-    open_issues = [issue for issue in all_auth_issues if issue.get('state', '') == 'open']
-    closed_issues = [issue for issue in all_auth_issues if issue.get('state', '') == 'closed']
+    # Since we're only working with open issues now
+    open_issues = all_auth_issues
     
     # Get recent issues (last 90 days)
     now = datetime.now()
     recent_cutoff = now - timedelta(days=90)
     recent_issues = []
     
-    for issue in all_auth_issues:
+    for issue in open_issues:
         try:
             created_at = issue.get('created_at', '')
             if created_at:
@@ -251,27 +254,25 @@ def generate_complete_auth_report(data_files, output_file):
             continue
     
     # Get most active issues
-    most_active = sorted(all_auth_issues, key=lambda x: -x.get('comments', 0))
+    most_active = sorted(open_issues, key=lambda x: -x.get('comments', 0))
     
     # Generate report content
-    total_issues = len(all_auth_issues)
+    total_issues = len(open_issues)
     
-    report_content = f"""# Azure Developer CLI (azd) - Authentication Issues Complete Analysis
+    report_content = f"""# Azure Developer CLI (azd) - Open Authentication Issues Complete Analysis
 
 **Generated:** {now.strftime('%B %d, %Y')}  
 **Repository:** Azure/azure-dev  
-**Focus:** Authentication, Login, and Credential Management Issues  
+**Focus:** Open Authentication, Login, and Credential Management Issues  
 **Analysis Period:** July 2022 - July 2025
 
 ## Executive Summary
 
-This report provides a **COMPLETE** analysis of authentication-related issues in the Azure Developer CLI repository, listing ALL identified issues in each category rather than providing abbreviated examples.
+This report provides a **COMPLETE** analysis of open authentication-related issues in the Azure Developer CLI repository, listing ALL identified open issues in each category rather than providing abbreviated examples.
 
 ### Key Metrics
 
-- **Total Authentication Issues:** {total_issues} issues identified
-- **Open Issues:** {len(open_issues)} ({len(open_issues)/total_issues*100:.1f}%)
-- **Closed Issues:** {len(closed_issues)} ({len(closed_issues)/total_issues*100:.1f}%)
+- **Total Open Authentication Issues:** {len(open_issues)} issues identified
 - **Recent Issues (Last 90 Days):** {len(recent_issues)}
 - **Categories Identified:** {len(category_stats)}
 
@@ -338,10 +339,8 @@ This report provides a **COMPLETE** analysis of authentication-related issues in
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(report_content)
     
-    print(f"Complete authentication issues report generated: {output_file}")
-    print(f"Total authentication issues: {total_issues}")
-    print(f"Open issues: {len(open_issues)}")
-    print(f"Closed issues: {len(closed_issues)}")
+    print(f"Complete open authentication issues report generated: {output_file}")
+    print(f"Total open authentication issues: {total_issues}")
     print(f"Categories found: {len(category_stats)}")
 
 

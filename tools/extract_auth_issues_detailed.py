@@ -228,17 +228,16 @@ def generate_report(auth_issues, output_file):
     """
     now = datetime.now()
     
-    # Calculate statistics
-    total_issues = len(auth_issues)
+    # Filter to open issues only and calculate statistics
     open_issues = [issue for issue in auth_issues if issue.get('state') == 'open']
-    closed_issues = [issue for issue in auth_issues if issue.get('state') == 'closed']
+    total_issues = len(open_issues)
     
-    # Category analysis
+    # Category analysis (open issues only)
     category_stats = defaultdict(int)
     platform_stats = defaultdict(int)
     priority_distribution = {'high': 0, 'medium': 0, 'low': 0}
     
-    for issue in auth_issues:
+    for issue in open_issues:
         categories = issue.get('categories', ['General Auth'])
         for cat in categories:
             category_stats[cat] += 1
@@ -260,15 +259,15 @@ def generate_report(auth_issues, output_file):
         else:
             priority_distribution['low'] += 1
     
-    # Most active issues (by comments and reactions)
-    most_active = sorted(auth_issues, 
+    # Most active issues (by comments and reactions) - open issues only
+    most_active = sorted(open_issues, 
                         key=lambda x: (x.get('comments', 0) + x.get('reactions', {}).get('total_count', 0)), 
                         reverse=True)[:10]
     
-    # Recent issues (last 90 days)
+    # Recent issues (last 90 days) - open issues only
     recent_cutoff = datetime.now().replace(tzinfo=None) - timedelta(days=90)
     recent_issues = []
-    for issue in auth_issues:
+    for issue in open_issues:
         created_at = issue.get('created_at', '')
         if created_at:
             try:
@@ -279,24 +278,21 @@ def generate_report(auth_issues, output_file):
                 pass
     
     # Generate markdown report
-    report_content = f"""# Azure Developer CLI (azd) - Authentication Issues Detailed Analysis
+    report_content = f"""# Azure Developer CLI (azd) - Open Authentication Issues Detailed Analysis
 
 **Generated:** {now.strftime('%B %d, %Y')}  
 **Repository:** Azure/azure-dev  
-**Focus:** Authentication, Login, and Credential Management Issues  
-**Total Authentication Issues Analyzed:** {total_issues}
+**Focus:** Open Authentication, Login, and Credential Management Issues  
+**Total Open Authentication Issues Analyzed:** {total_issues}
 
 ## Executive Summary
 
-This report provides a comprehensive analysis of authentication-related issues in the Azure Developer CLI repository. Authentication problems represent {(len(open_issues)/842*100):.1f}% of all open issues, making it the second most critical issue category after environment management.
+This report provides a comprehensive analysis of open authentication-related issues in the Azure Developer CLI repository. Open authentication problems represent a significant portion of actionable issues in the repository.
 
 ### Key Metrics
 
-- **Total Authentication Issues:** {total_issues}
-- **Currently Open:** {len(open_issues)} issues
-- **Resolved:** {len(closed_issues)} issues  
-- **Resolution Rate:** {(len(closed_issues)/total_issues*100):.1f}%
-- **Average Priority Score:** {sum(issue.get('priority_score', 0) for issue in auth_issues) / len(auth_issues):.1f}
+- **Total Open Authentication Issues:** {total_issues}
+- **Average Priority Score:** {sum(issue.get('priority_score', 0) for issue in open_issues) / len(open_issues):.1f}
 
 ### Top Issue Categories
 
@@ -334,8 +330,8 @@ This report provides a comprehensive analysis of authentication-related issues i
 |-------|-------|---------|-----------|----------|---------------|------------|
 """
     
-    # Add top 20 critical issues
-    for issue in auth_issues[:20]:
+    # Add top 20 critical issues (open only)
+    for issue in sorted(open_issues, key=lambda x: -x.get('priority_score', 0))[:20]:
         number = issue.get('number', 'N/A')
         title = issue.get('title', 'No title')[:80]
         if len(issue.get('title', '')) > 80:
@@ -462,7 +458,7 @@ Device code authentication problems include:
             continue
             
         report_content += f"\n#### {category} ({count} issues)\n\n"
-        category_issues = [issue for issue in auth_issues if category in issue.get('categories', [])]
+        category_issues = [issue for issue in open_issues if category in issue.get('categories', [])]
         category_issues.sort(key=lambda x: -x.get('priority_score', 0))
         
         for issue in category_issues[:10]:  # Limit to top 10 per category
@@ -471,7 +467,7 @@ Device code authentication problems include:
             state = issue.get('state', 'unknown')
             comments = issue.get('comments', 0)
             
-            report_content += f"- [#{number}](https://github.com/Azure/azure-dev/issues/{number}) {title} ({state}, {comments} comments)\n"
+            report_content += f"- [#{number}](https://github.com/Azure/azure-dev/issues/{number}) {title} ({comments} comments)\n"
         
         if len(category_issues) > 10:
             report_content += f"- ... and {len(category_issues) - 10} more issues\n"
@@ -493,10 +489,8 @@ Device code authentication problems include:
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(report_content)
     
-    print(f"Authentication issues detailed report generated: {output_file}")
-    print(f"Total authentication issues: {total_issues}")
-    print(f"Open issues: {len(open_issues)}")
-    print(f"Closed issues: {len(closed_issues)}")
+    print(f"Open authentication issues detailed report generated: {output_file}")
+    print(f"Total open authentication issues: {total_issues}")
     print(f"Categories found: {len(category_stats)}")
 
 
