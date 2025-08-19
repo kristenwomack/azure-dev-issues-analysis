@@ -109,15 +109,14 @@ def calculate_age_in_days(created_at):
     return (now - created).days
 
 def generate_auth_report(auth_issues):
-    """Generate detailed authentication issues report"""
+    """Generate detailed authentication issues report - open issues only"""
     
-    # Separate open and closed issues
+    # Filter to only open issues
     open_issues = [issue for issue in auth_issues if issue['state'] == 'open']
-    closed_issues = [issue for issue in auth_issues if issue['state'] == 'closed']
     
-    # Calculate average age
-    total_age = sum(calculate_age_in_days(issue['created_at']) for issue in auth_issues)
-    avg_age = total_age / len(auth_issues) if auth_issues else 0
+    # Calculate average age of open issues
+    total_age = sum(calculate_age_in_days(issue['created_at']) for issue in open_issues)
+    avg_age = total_age / len(open_issues) if open_issues else 0
     
     # Generate timestamp
     timestamp = datetime.now().strftime("%Y%m%d")
@@ -126,16 +125,15 @@ def generate_auth_report(auth_issues):
 
 **Report Generated:** {datetime.now().strftime("%B %d, %Y")}  
 **Repository:** Azure/azure-dev  
-**Total Authentication Issues:** {len(auth_issues)}  
+**Total Authentication Issues:** {len(open_issues)}  
 **Data Source:** GitHub Issues API
 
 ## Summary
 
-This report contains all authentication and login related issues from the Azure Developer CLI repository. Issues are identified by keywords related to authentication, login, credentials, tokens, and access management.
+This report contains open authentication and login related issues from the Azure Developer CLI repository. Issues are identified by keywords related to authentication, login, credentials, tokens, and access management.
 
 **Quick Stats:**
 - **Open Issues**: {len(open_issues)}
-- **Closed Issues**: {len(closed_issues)}
 - **Average Age**: {avg_age:.0f} days
 
 ## 🔴 Open Authentication Issues
@@ -152,23 +150,6 @@ This report contains all authentication and login related issues from the Azure 
         
         report_content += f"| {issue['number']} | [{issue['title']}]({issue['html_url']}) | {created_date} | {age} | {issue['comments']} | {labels} |\n"
 
-    report_content += f"""
-
-## ✅ Closed Authentication Issues
-
-| # | Issue Title | Created | Closed | Age (Days) | Comments | Labels |
-|---|-------------|---------|--------|------------|----------|--------|
-"""
-
-    # Add closed issues table
-    for issue in sorted(closed_issues, key=lambda x: x['number'], reverse=True)[:50]:  # Limit to 50 most recent
-        age = calculate_age_in_days(issue['created_at'])
-        created_date = datetime.fromisoformat(issue['created_at'].replace('Z', '+00:00')).strftime("%Y-%m-%d")
-        closed_date = datetime.fromisoformat(issue['closed_at'].replace('Z', '+00:00')).strftime("%Y-%m-%d") if issue['closed_at'] else 'N/A'
-        labels = ', '.join([label['name'] for label in issue['labels']]) if issue['labels'] else ''
-        
-        report_content += f"| {issue['number']} | [{issue['title']}]({issue['html_url']}) | {created_date} | {closed_date} | {age} | {issue['comments']} | {labels} |\n"
-
     # Add analysis section
     report_content += f"""
 
@@ -180,9 +161,9 @@ Based on keyword analysis, authentication issues fall into these categories:
 
 """
 
-    # Analyze keywords
+    # Analyze keywords from open issues only
     keyword_counts = {}
-    for issue in auth_issues:
+    for issue in open_issues:
         for keyword in issue.get('matched_keywords', []):
             keyword_counts[keyword] = keyword_counts.get(keyword, 0) + 1
 
@@ -190,48 +171,47 @@ Based on keyword analysis, authentication issues fall into these categories:
     sorted_keywords = sorted(keyword_counts.items(), key=lambda x: x[1], reverse=True)
 
     for keyword, count in sorted_keywords[:15]:  # Top 15 keywords
-        percentage = (count / len(auth_issues)) * 100
+        percentage = (count / len(open_issues)) * 100 if open_issues else 0
         report_content += f"- **{keyword}**: {count} issues ({percentage:.1f}%)\n"
 
-    # Add top issues by comments
+    # Add top issues by comments (open issues only)
     report_content += f"""
 
-### Most Discussed Authentication Issues
+### Most Discussed Open Authentication Issues
 
-These are the authentication issues with the most community engagement:
+These are the open authentication issues with the most community engagement:
 
 """
 
-    # Sort by comments
-    top_commented = sorted(auth_issues, key=lambda x: x['comments'], reverse=True)[:10]
+    # Sort by comments - open issues only
+    top_commented = sorted(open_issues, key=lambda x: x['comments'], reverse=True)[:10]
     
     for issue in top_commented:
         if issue['comments'] > 0:
             age = calculate_age_in_days(issue['created_at'])
-            status = "🔴 OPEN" if issue['state'] == 'open' else "✅ CLOSED"
-            report_content += f"- **[#{issue['number']}]({issue['html_url']})** - {issue['title']} ({issue['comments']} comments, {age} days old) {status}\n"
+            report_content += f"- **[#{issue['number']}]({issue['html_url']})** - {issue['title']} ({issue['comments']} comments, {age} days old)\n"
 
     # Add recent activity
     report_content += f"""
 
-### Recent Authentication Issues (Last 30 Days)
+### Recent Open Authentication Issues (Last 30 Days)
 
 """
 
-    # Filter recent issues
-    thirty_days_ago = datetime.now() - timedelta(days=30)
+    # Filter recent issues (open only)
+    from datetime import timezone
+    thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
     recent_issues = [
-        issue for issue in auth_issues 
+        issue for issue in open_issues 
         if datetime.fromisoformat(issue['created_at'].replace('Z', '+00:00')) > thirty_days_ago
     ]
 
     if recent_issues:
         for issue in sorted(recent_issues, key=lambda x: x['created_at'], reverse=True):
             age = calculate_age_in_days(issue['created_at'])
-            status = "🔴 OPEN" if issue['state'] == 'open' else "✅ CLOSED"
-            report_content += f"- **[#{issue['number']}]({issue['html_url']})** - {issue['title']} ({age} days ago) {status}\n"
+            report_content += f"- **[#{issue['number']}]({issue['html_url']})** - {issue['title']} ({age} days ago)\n"
     else:
-        report_content += "No authentication issues created in the last 30 days.\n"
+        report_content += "No open authentication issues created in the last 30 days.\n"
 
     # Add platform analysis
     report_content += f"""
@@ -257,7 +237,7 @@ Authentication issues by platform and environment:
 
     platform_counts = {platform: 0 for platform in platforms.keys()}
     
-    for issue in auth_issues:
+    for issue in open_issues:
         issue_text = f"{issue['title']} {issue['body'] or ''}".lower()
         for platform, keywords in platforms.items():
             if any(keyword in issue_text for keyword in keywords):
@@ -265,40 +245,15 @@ Authentication issues by platform and environment:
 
     for platform, count in sorted(platform_counts.items(), key=lambda x: x[1], reverse=True):
         if count > 0:
-            percentage = (count / len(auth_issues)) * 100
+            percentage = (count / len(open_issues)) * 100 if open_issues else 0
             report_content += f"- **{platform}**: {count} issues ({percentage:.1f}%)\n"
-
-    report_content += f"""
-
-### Resolution Time Analysis
-
-For closed authentication issues:
-
-"""
-
-    # Calculate resolution times for closed issues
-    resolution_times = []
-    for issue in closed_issues:
-        if issue['closed_at']:
-            created = datetime.fromisoformat(issue['created_at'].replace('Z', '+00:00'))
-            closed = datetime.fromisoformat(issue['closed_at'].replace('Z', '+00:00'))
-            resolution_time = (closed - created).days
-            resolution_times.append(resolution_time)
-
-    if resolution_times:
-        avg_resolution = sum(resolution_times) / len(resolution_times)
-        median_resolution = sorted(resolution_times)[len(resolution_times) // 2]
-        report_content += f"- **Average Resolution Time**: {avg_resolution:.1f} days\n"
-        report_content += f"- **Median Resolution Time**: {median_resolution} days\n"
-        report_content += f"- **Fastest Resolution**: {min(resolution_times)} days\n"
-        report_content += f"- **Slowest Resolution**: {max(resolution_times)} days\n"
 
     # Add recommendations
     report_content += f"""
 
 ## 🎯 Recommendations
 
-Based on the analysis of {len(auth_issues)} authentication-related issues:
+Based on the analysis of {len(open_issues)} open authentication-related issues:
 
 ### Top Priority Areas
 

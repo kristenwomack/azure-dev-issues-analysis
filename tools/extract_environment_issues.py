@@ -109,27 +109,27 @@ def calculate_age(created_at):
     return age_days
 
 def create_environment_issues_report(issues):
-    """Create a markdown report with all environment issues"""
+    """Create a markdown report with open environment issues only"""
     
-    # Sort issues by creation date (newest first)
-    issues_sorted = sorted(issues, key=lambda x: x['created_at'], reverse=True)
+    # Filter to only open issues and sort by creation date (newest first)
+    open_issues = [i for i in issues if i['state'] == 'open']
+    issues_sorted = sorted(open_issues, key=lambda x: x['created_at'], reverse=True)
     
     # Create markdown content
     markdown_content = f"""# Environment Management Issues - Azure Developer CLI
 
 **Report Generated:** {datetime.now().strftime('%B %d, %Y')}  
 **Repository:** Azure/azure-dev  
-**Total Environment Issues:** {len(issues)}  
+**Total Environment Issues:** {len(open_issues)}  
 **Data Source:** GitHub Issues API
 
 ## Summary
 
-This report contains all environment management related issues from the Azure Developer CLI repository. Issues are identified by keywords related to environment configuration, variables, multi-environment workflows, and environment management commands.
+This report contains open environment management related issues from the Azure Developer CLI repository. Issues are identified by keywords related to environment configuration, variables, multi-environment workflows, and environment management commands.
 
 **Quick Stats:**
-- **Open Issues**: {len([i for i in issues if i['state'] == 'open'])}
-- **Closed Issues**: {len([i for i in issues if i['state'] == 'closed'])}
-- **Average Age**: {sum(calculate_age(i['created_at']) for i in issues) // len(issues) if issues else 0} days
+- **Open Issues**: {len(open_issues)}
+- **Average Age**: {sum(calculate_age(i['created_at']) for i in open_issues) // len(open_issues) if open_issues else 0} days
 
 ## 🟢 Open Environment Issues
 
@@ -138,8 +138,7 @@ This report contains all environment management related issues from the Azure De
 """
 
     # Add open issues to the table
-    open_issues = [i for i in issues_sorted if i['state'] == 'open']
-    for issue in open_issues:
+    for issue in issues_sorted:
         age_days = calculate_age(issue['created_at'])
         created_date = datetime.strptime(issue['created_at'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%d')
         
@@ -155,32 +154,6 @@ This report contains all environment management related issues from the Azure De
         
         markdown_content += f"| {issue['number']} | [{title}](https://github.com/Azure/azure-dev/issues/{issue['number']}) | {created_date} | {age_days} | {issue['comments']} | {labels} |\n"
 
-    markdown_content += f"""
-
-## 🔴 Closed Environment Issues
-
-| # | Issue Title | Created | Age (Days) | Comments | Labels |
-|---|-------------|---------|------------|----------|--------|
-"""
-
-    # Add closed issues to the table
-    closed_issues = [i for i in issues_sorted if i['state'] == 'closed']
-    for issue in closed_issues:
-        age_days = calculate_age(issue['created_at'])
-        created_date = datetime.strptime(issue['created_at'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%d')
-        
-        # Truncate title if too long
-        title = issue['title']
-        if len(title) > 80:
-            title = title[:80] + "..."
-        
-        # Get labels
-        labels = ', '.join([label['name'] for label in issue.get('labels', [])][:3])  # Max 3 labels
-        if len(issue.get('labels', [])) > 3:
-            labels += "..."
-        
-        markdown_content += f"| {issue['number']} | [{title}](https://github.com/Azure/azure-dev/issues/{issue['number']}) | {created_date} | {age_days} | {issue['comments']} | {labels} |\n"
-    
     # Add additional sections
     markdown_content += f"""
 
@@ -190,7 +163,7 @@ This report contains all environment management related issues from the Azure De
 """
     
     # Most commented issues
-    most_commented = sorted([i for i in issues if i['state'] == 'open'], key=lambda x: x['comments'], reverse=True)[:10]
+    most_commented = sorted(open_issues, key=lambda x: x['comments'], reverse=True)[:10]
     for i, issue in enumerate(most_commented, 1):
         markdown_content += f"{i}. [#{issue['number']}](https://github.com/Azure/azure-dev/issues/{issue['number']}) - {issue['title']} ({issue['comments']} comments)\n"
     
@@ -201,7 +174,7 @@ This report contains all environment management related issues from the Azure De
     
     # Recent issues
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    recent_issues = [i for i in issues if datetime.strptime(i['created_at'], '%Y-%m-%dT%H:%M:%SZ') > thirty_days_ago]
+    recent_issues = [i for i in open_issues if datetime.strptime(i['created_at'], '%Y-%m-%dT%H:%M:%SZ') > thirty_days_ago]
     
     for issue in recent_issues[:10]:
         age_days = calculate_age(issue['created_at'])
@@ -213,7 +186,7 @@ This report contains all environment management related issues from the Azure De
 """
     
     # Oldest open issues
-    oldest_open = sorted([i for i in issues if i['state'] == 'open'], key=lambda x: x['created_at'])[:10]
+    oldest_open = sorted(open_issues, key=lambda x: x['created_at'])[:10]
     for issue in oldest_open:
         age_days = calculate_age(issue['created_at'])
         created_date = datetime.strptime(issue['created_at'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%d')
@@ -223,7 +196,7 @@ This report contains all environment management related issues from the Azure De
 
 ## Environment Management Pain Points
 
-Based on the analysis of {len(issues)} environment-related issues, the following patterns emerge:
+Based on the analysis of {len(open_issues)} open environment-related issues, the following patterns emerge:
 
 1. **Environment Configuration Complexity** - Many issues relate to setting up and managing multiple environments
 2. **Variable Management** - Environment variable handling and precedence causes confusion
@@ -233,7 +206,7 @@ Based on the analysis of {len(issues)} environment-related issues, the following
 
 ## Recommendations
 
-1. **Immediate**: Focus on the {len([i for i in issues if i['state'] == 'open'])} open environment issues
+1. **Immediate**: Focus on the {len(open_issues)} open environment issues
 2. **High Priority**: Address the most commented issues (high community engagement)
 3. **User Experience**: Simplify environment setup and switching workflows
 4. **Documentation**: Create comprehensive environment management guides
@@ -244,7 +217,7 @@ Based on the analysis of {len(issues)} environment-related issues, the following
 **Report Details:**
 - Generated from GitHub Issues API
 - Filtered by environment-related keywords
-- Includes both open and closed issues for trend analysis
+- Includes only open issues to focus on actionable items
 - Age calculated from creation date to {datetime.now().strftime('%B %d, %Y')}
 
 *This report supports the comprehensive Azure Developer CLI analysis framework.*
@@ -277,14 +250,15 @@ def main():
     print(f"Environment issues report saved to: {filepath}")
     print(f"📊 Total environment issues: {len(issues)}")
     print(f"🟢 Open issues: {len([i for i in issues if i['state'] == 'open'])}")
-    print(f"🔴 Closed issues: {len([i for i in issues if i['state'] == 'closed'])}")
+    print(f"📋 Report includes only open issues for actionable focus")
     
-    # Also save raw data
+    # Also save raw data (open issues only)
     data_filename = f"environment-issues-data-{datetime.now().strftime('%Y%m%d')}.json"
     data_filepath = f"data/raw-data/{data_filename}"
     
+    open_issues_only = [i for i in issues if i['state'] == 'open']
     with open(data_filepath, 'w') as f:
-        json.dump(issues, f, indent=2)
+        json.dump(open_issues_only, f, indent=2)
     
     print(f"💾 Raw data saved to: {data_filepath}")
 
