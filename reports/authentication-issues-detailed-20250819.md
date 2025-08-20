@@ -5,9 +5,9 @@
 **Focus:** Authentication, Login, and Credential Management Issues  
 **Analysis Period:** July 2022 - July 2025
 
-## Executive Summary
+## Summary
 
-This report provides a comprehensive analysis of authentication-related issues in the Azure Developer CLI repository. Authentication problems represent the **second most critical issue category**, with 104 identified issues accounting for **12.4%** of all open issues in the repository.
+This report provides an analysis of authentication-related issues in the Azure Developer CLI repository. Authentication problems represent the **second most critical issue category** of all open issues in the repository.
 
 ### Key Metrics
 
@@ -33,47 +33,26 @@ This report provides a comprehensive analysis of authentication-related issues i
 | Issue | Title | Created | Days Open | Comments | Category | Priority |
 |-------|-------|---------|-----------|----------|----------|----------|
 | 5473 | [azd login with federated credential fails because the subject is scoped to the G...](https://github.com/Azure/azure-dev/issues/5473) | 2025-07-10 | 40 | 4 | Federated Identity | **High** |
-| 5428 | [azd login --use-device-code did not properly function](https://github.com/Azure/azure-dev/issues/5428) | 2025-07-02 | 48 | 5 | Device Code Flow | **High** |
 | 5181 | [Still Unable to deploy to AKS cluster with Microsoft Entra ID authentication](https://github.com/Azure/azure-dev/issues/5181) | 2025-05-11 | 100 | 0 | AKS/Kubernetes Auth | **High** |
-| 5074 | [Unable to deploy to AKS cluster with Microsoft Entra ID authentication](https://github.com/Azure/azure-dev/issues/5074) | 2025-04-10 | 131 | 2 | AKS/Kubernetes Auth | **High** |
-| 3882 | [When `azd auth login`, x509 error occurred in WSL](https://github.com/Azure/azure-dev/issues/3882) | 2024-05-09 | 468 | 2 | WSL Authentication | **High** |
 | 3808 | [Remote end - `InvalidAuthenticationInfo`](https://github.com/Azure/azure-dev/issues/3808) | 2024-04-28 | 479 | 9 | General Auth Error | **High** |
 | 3791 | [dotnet/eShop certificate/login issue](https://github.com/Azure/azure-dev/issues/3791) | 2024-04-25 | 482 | 6 | Certificate Auth | **High** |
 | 3742 | [--use-device-code auth flow presents the wrong app name](https://github.com/Azure/azure-dev/issues/3742) | 2024-04-18 | 489 | 1 | Device Code Flow | **Medium** |
-| 3485 | [multi-tenancy support - InvalidAuthenticationTokenTenant Error](https://github.com/Azure/azure-dev/issues/3485) | 2024-03-06 | 532 | 4 | Multi-tenant | **High** |
-| 3277 | [azd auth login requires device code in Dev Containers](https://github.com/Azure/azure-dev/issues/3277) | 2024-02-01 | 565 | 8 | Dev Containers | **High** |
 
-### Recent Authentication Issues (last 90 days)
 
-| Issue | Title | Created | Category | Status |
-|-------|-------|---------|----------|---------|
-| 5473 | [azd login with federated credential fails](https://github.com/Azure/azure-dev/issues/5473) | 2025-07-10 | Federated Identity | Open |
-| 5440 | [Issue login in ML](https://github.com/Azure/azure-dev/issues/5440) | 2025-07-05 | General Login | Open |
-| 5438 | [Skip auth config for Ado - panic error](https://github.com/Azure/azure-dev/issues/5438) | 2025-07-04 | Pipeline Auth | Open |
-| 5428 | [azd login --use-device-code did not properly function](https://github.com/Azure/azure-dev/issues/5428) | 2025-07-02 | Device Code Flow | Open |
-
-### Most Engaged Authentication Issues (by community activity)
-
-| Issue | Title | Comments | Reactions | Community Impact |
-|-------|-------|----------|-----------|------------------|
-| 2980 | [Container Registry auth error while deploying apps through `azd up`](https://github.com/Azure/azure-dev/issues/2980) | 14 | High | **Critical** |
-| 3808 | [Remote end - `InvalidAuthenticationInfo`](https://github.com/Azure/azure-dev/issues/3808) | 9 | Medium | **High** |
-| 3277 | [azd auth login requires device code in Dev Containers](https://github.com/Azure/azure-dev/issues/3277) | 8 | High | **High** |
-| 2979 | [Inconsistent login behavior in Codespaces](https://github.com/Azure/azure-dev/issues/2979) | 7 | Medium | **High** |
-| 3791 | [dotnet/eShop certificate/login issue](https://github.com/Azure/azure-dev/issues/3791) | 6 | Medium | **Medium** |
-| 3230 | [azd auth login in local vscode dev container fails to redirect](https://github.com/Azure/azure-dev/issues/3230) | 6 | Medium | **Medium** |
 
 ## Category Deep Dive
 
 ### 1. WSL/Linux Authentication Issues (15+ issues)
 
 **Primary Challenges:**
+
 - X.509 certificate errors in WSL environments
 - Browser integration and display forwarding issues
 - Credential storage and keychain integration problems
 - Token persistence across WSL sessions
 
 **Key Issues:**
+
 - #3882: X.509 error occurred in WSL during `azd auth login`
 - #4865: Invalid configuration on Ubuntu
 - Multiple WSL-specific authentication failures
@@ -83,28 +62,29 @@ This report provides a comprehensive analysis of authentication-related issues i
 ### 2. Device Code Flow Issues (12+ issues)
 
 **Primary Challenges:**
+
 - Browser availability in containerized environments
 - Incorrect app name display during device code flow
 - Network restrictions and proxy configurations
 - User experience friction in headless scenarios
 
 **Key Issues:**
-- #5428: Device code flow not functioning properly
+
 - #3742: Wrong app name in device code flow
-- #3277: Device code required in Dev Containers
-- #3091: Device code improvements for Jupyter notebooks
 
 **Impact:** Critical - Essential for containerized and headless environments
 
 ### 3. Service Principal Authentication (10+ issues)
 
 **Primary Challenges:**
+
 - Configuration complexity and documentation gaps
 - Certificate vs. secret-based authentication
 - Multi-tenant scenarios and cross-tenant access
 - CI/CD pipeline integration challenges
 
 **Key Issues:**
+
 - #4128: Ignore auth for SP with flag in pipeline config
 - #5438: Skip auth config for Azure DevOps
 - #3099: Remove credential as secret in Azure DevOps pipelines
@@ -120,7 +100,7 @@ This report provides a comprehensive analysis of authentication-related issues i
 - Docker authentication integration
 
 **Key Issues:**
-- #3277: Dev Container device code requirement
+
 - #3230: VSCode dev container redirect failures
 - #2979: Inconsistent login behavior in Codespaces
 - #3091: Jupyter notebook authentication improvements
@@ -197,16 +177,19 @@ This report provides a comprehensive analysis of authentication-related issues i
 ### Business Impact
 
 **High Impact Issues (Blocking Development):**
+
 - WSL authentication failures (affects developer productivity)
 - Service Principal setup complexity (blocks CI/CD adoption)
 - Container authentication issues (impedes modern development workflows)
 
 **Medium Impact Issues (Workarounds Available):**
+
 - Multi-tenant authentication complexity
 - Platform-specific authentication quirks
 - Token refresh and management issues
 
 **Low Impact Issues (Enhancement Requests):**
+
 - Authentication UI/UX improvements
 - Advanced authentication features
 - Optional authentication methods
@@ -214,11 +197,13 @@ This report provides a comprehensive analysis of authentication-related issues i
 ### User Experience Impact
 
 **Severe UX Issues:**
+
 - Cryptic error messages without clear resolution steps
 - Complex service principal setup requirements
 - Inconsistent authentication behavior across platforms
 
 **Moderate UX Issues:**
+
 - Device code flow presentation issues
 - Browser integration challenges
 - Token expiration handling
@@ -242,50 +227,6 @@ This report provides a comprehensive analysis of authentication-related issues i
    - Improve browser integration for Dev Containers
    - Add container-specific authentication documentation
 
-### Medium-term Goals (Next 90 Days)
-
-1. **Unified Authentication Experience**
-   - Implement consistent authentication flow across all platforms
-   - Standardize error messages and troubleshooting guidance
-   - Create authentication health check command (`azd auth status --detailed`)
-
-2. **Authentication Diagnostics**
-   - Add comprehensive authentication troubleshooting tools
-   - Implement automated authentication problem detection
-   - Create self-healing authentication flows where possible
-
-3. **Developer Experience Improvements**
-   - Simplify service principal setup process
-   - Improve token management and refresh mechanisms
-   - Add authentication method recommendations based on environment
-
-## Priority Matrix
-
-### Critical Priority (Fix Immediately)
-
-- **WSL X.509 errors** (#3882) - Blocking Linux developers
-- **Federated credential failures** (#5473) - Blocking modern auth scenarios
-- **Device code flow failures** (#5428, #3742) - Blocking container users
-
-### High Priority (Fix Within 60 Days)
-
-- **AKS authentication issues** (#5181, #5074) - Blocking Kubernetes deployments
-- **Service Principal complexity** (#4128, #5438) - Blocking CI/CD adoption
-- **Container auth failures** (#3277, #3230) - Blocking modern development
-
-### Medium Priority (Fix Within 90 Days)
-
-- **Multi-tenant support** (#3485) - Enhancement for enterprise scenarios
-- **Authentication UX improvements** - General user experience
-- **Documentation gaps** - Better setup and troubleshooting guides
-
-### Low Priority (Enhancement/Future)
-
-- **Advanced authentication features** - Optional capabilities
-- **Authentication method preferences** - User customization
-- **Integration improvements** - External tool compatibility
-
-## Appendix
 
 ### Authentication Issue Categories (Representative Examples)
 
@@ -326,8 +267,6 @@ This report provides a comprehensive analysis of authentication-related issues i
 ##### Device Code Flow (Top Examples from 34 total issues)
 
 - [#5428](https://github.com/Azure/azure-dev/issues/5428): azd login --use-device-code did not properly function (Created: 2025-07-02, State: open, Comments: 5)
-- [#3742](https://github.com/Azure/azure-dev/issues/3742): --use-device-code auth flow presents the wrong app name (Created: 2024-04-18, State: closed, Comments: 1)
-- [#3277](https://github.com/Azure/azure-dev/issues/3277): azd auth login requires device code in Dev Containers (Created: 2024-02-01, State: closed, Comments: 8)
 
 ##### Token Management (Top Examples from 75 total issues)
 
