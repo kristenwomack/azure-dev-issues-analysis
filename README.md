@@ -5,29 +5,55 @@ This project contains the comprehensive analysis of GitHub issues in the Azure/a
 
 ## Project Structure
 ```
-github-issues-project/
-├── README.md                           # This file - project overview
-├── analysis/
-│   ├── 01-top-customer-issues.md       # Top customer-reported issues and struggles
-│   ├── 02-issue-clustering.md          # Duplicate and similar issue clustering
-│   ├── 03-feature-gap-analysis.md      # Features already available vs. requested
-│   ├── 04-documentation-gaps.md        # Documentation gaps for existing features
-│   ├── 05-trend-analysis.md            # Trend analysis over time
-│   └── 06-actionable-recommendations.md # Actionable recommendations
-├── data/
-│   ├── search-queries.md               # GitHub search queries used
-│   ├── raw-data/                       # Raw issue data collected
-│   └── processed-data/                 # Cleaned and categorized data
-├── reports/
-│   ├── issue-analysis-report.md        # High-level report analysis of all issues
-│   ├── powershell-pwsh-issues...       # Detailed findings for PowerShell issues
-│   ├── multi-env (comprehensive)       # Full report of env issues
-│   ├── multi-env (focused)             # Env report focused on customer reported
-│   └── env-issues (detailed)           # Env report detailed   
-└── tools/
-    ├── issue-collector.md              # Scripts/tools for data collection
-    └── analysis-helpers.md             # Helper tools and utilities
+azure-dev-issues-analysis/
+├── README.md                          # This file - project overview
+├── prompts/                           # AI agent instructions and frameworks
+│   ├── agents.md                      # Main agent instructions
+│   ├── analysis-frameworks/           # Analysis methodology frameworks
+│   │   ├── customer-issues.md         # Framework for analyzing customer issues
+│   │   ├── issue-clustering.md        # Framework for clustering related issues
+│   │   └── feature-gaps.md            # Framework for feature gap analysis
+│   └── templates/                     # Templates for consistent output
+│       └── analysis-report.md         # Standard report template
+├── analysis/                          # Raw analysis results and findings
+│   ├── README.md                      # Analysis folder purpose and organization
+│   └── [YYYYMMDD-analysis-name].md    # Date-stamped analysis files
+├── data/                              # Data collection and storage
+│   ├── search-queries.md              # GitHub search queries used
+│   └── raw-data/                      # Raw issue data collected
+├── reports/                           # Polished, customer-facing reports
+│   ├── issue-analysis-report.md       # Overall issue analysis
+│   ├── authentication-issues-*.md     # Authentication-focused reports
+│   ├── environment-issues-*.md        # Environment-related reports
+│   └── powershell-pwsh-*.md           # PowerShell-specific reports
+└── tools/                             # Analysis tools and utilities
+    ├── README.md                      # Tools documentation
+    ├── *.py                           # Python analysis scripts
+    ├── *.sh                           # Shell scripts
+    └── config.yaml                    # Tool configuration
 ```
+
+## Directory Purposes
+
+### /prompts
+
+Contains AI agent instructions and analysis frameworks. These define how analyses should be performed and structure the approach to issue investigation.
+
+### /analysis
+
+Contains raw analysis results and findings. This is where the initial data processing and analysis work is stored before being refined into reports.
+
+### /reports
+
+Contains polished, customer-facing reports synthesized from the analysis. These are the final output documents meant for sharing with stakeholders.
+
+### /data
+
+Stores raw and processed data from GitHub issues, including search queries and API responses.
+
+### /tools
+
+Contains scripts and utilities for data collection, processing, and analysis.
 
 ## Objectives
 
